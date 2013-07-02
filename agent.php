@@ -12,6 +12,13 @@ require_once('askfast/lib/answerresult.php');
     //define("DB_USER", "");
     //define("DB_PASS", "");
     //define("DB_DB", "");
+    
+    function getDBConn() {
+        $conn = mysql_connect(DB_SERVER, DB_USER, DB_PASS);
+        mysql_select_db(DB_DB);
+        
+        return $conn;
+    }
 
     function app_start() {
         global $askfast;
@@ -23,27 +30,51 @@ require_once('askfast/lib/answerresult.php');
     }
     
     function app_bid() {
+        
+        return app_request_bid();        
+    }
+    
+    function app_receivebid() {
+        
+        getDBConn();
+        $answer = new AnswerResult();
+        $responder = str_ireplace("@outbound","",$_GET["responder"]);
+        
+        $query = "INSERT INTO bid (Amount, Phonenumber, DateTime) VALUES (".$answer->getAnswerText().", \"".$responder."\", NOW())";
+        $res = mysql_query($query);
+        
+        return app_thankyou();
+    }
+    
+    function app_request_bid() {
+        
         global $askfast;
         global $filename;
                 
         $session = new Session();
         $askfast->ask('/audio/bid.wav', AskFast::QUESTION_TYPE_OPEN, $filename.'?function=receivebid&responder='.$session->getResponder());
         $askfast->finish();
-                
     }
     
-    function app_receivebid() {
+    function app_bidding_closed() {
         global $askfast;
         global $filename;
-                        
-        $conn = mysql_connect(DB_SERVER, DB_USER, DB_PASS);
-        mysql_select_db(DB_DB);
         
-        $answer = new AnswerResult();
-        $responder = str_ireplace("@outbound","",$_GET["responder"]);
+        $askfast->say('/audio/closed.wav', $filename.'?function=hangup');
+        $askfast->finish();
+    }
+    
+    function app_double_bid() {
+        global $askfast;
+        global $filename;
         
-        $query = "INSERT INTO bid (Amount, Phonenumber, DateTime) VALUES (".$answer->getAnswerText().", \"".$responder."\", NOW())";
-        $res = mysql_query($query, $conn);
+        $askfast->say('/audio/double.wav', $filename.'?function=hangup');
+        $askfast->finish();
+    }
+    
+    function app_thankyou() {
+        global $askfast;
+        global $filename;
         
         $askfast->say('/audio/thankyou.wav', $filename.'?function=hangup');
         $askfast->finish();
