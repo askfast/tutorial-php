@@ -10,13 +10,25 @@
 <html>
 <head>
     <title>AskFast Bidding Demo</title>
+    <link type="text/css" rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 <h1>AskFast Bidding Demo</h1>
 
 <h2>HTC One auction</h2>
-<img src="img/htc-one.png" /><br />
+
+<div class="flip-container" ontouchstart="this.classList.toggle('hover');">
+    <div class="flipper">
+        <div class="front">
+            <img src="img/htc1.png">
+        </div>
+        <div class="back">
+            <img src="img/back2.png">
+        </div>
+    </div>
+</div>
+
 
 <form method="post" src="index.php">
 <?php
