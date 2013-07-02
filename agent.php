@@ -6,6 +6,7 @@ require_once('askfast/lib/answerresult.php');
 
     $filename = 'agent.php';
     $askfast = new AskFast();
+    define("MAX_BIDS",2);
     
     // Please fill your database information and uncomment
     //define("DB_SERVER", "");
@@ -35,7 +36,6 @@ require_once('askfast/lib/answerresult.php');
         $responder = str_ireplace("@outbound","",$session->getResponder());
         
         getDBConn();
-        $maxBids = 2;
         $query = "SELECT * FROM bid";
         $res = mysql_query($query);
         $count = 0;
@@ -46,7 +46,7 @@ require_once('askfast/lib/answerresult.php');
             $count++;
         }
         
-        if($count>=$maxBids)
+        if($count>=MAX_BIDS)
             return app_bidding_closed();
         
         return app_request_bid();        
@@ -93,7 +93,7 @@ require_once('askfast/lib/answerresult.php');
     function app_thankyou() {
         global $askfast;
         global $filename;
-        
+                        
         $askfast->say('/audio/thankyou.wav', $filename.'?function=hangup');
         $askfast->finish();
     }

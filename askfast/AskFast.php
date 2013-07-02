@@ -53,6 +53,31 @@ class AskFast {
         return $this->sendJSONRPC("outboundCall", $params);
     }
     
+    public function sms($address, $url=null) {
+        
+        if($this->privateKey==null)
+            throw new Exception("No private key set!");
+            
+        if($this->publicKey==null)
+            throw new Exception("No public key set!");
+            
+        if($url==null)
+            $url = $this->url;
+            
+        $url = $this->formatURL($url);
+            
+        //echo "Going to call: ".$address." with url: ".$url."<br />";
+        
+        $params = new stdClass;
+        $params->address = $address;
+        $params->url = $url;
+        $params->publicKey = $this->publicKey;
+        $params->privateKey = $this->privateKey;
+        $params->adapterType = "sms";
+        
+        return $this->sendJSONRPC("outboundCall", $params);
+    }
+    
     public function ask($ask, $type, $next=null) {
         
         if($this->response->question_text=="") {
