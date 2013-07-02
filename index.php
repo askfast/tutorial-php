@@ -3,7 +3,8 @@
   
   // Before start uncomment following and fill in your credentials
   //define("PUBLIC_KEY", "");
-  //define("PRIVATE_KEY", "");  
+  //define("PRIVATE_KEY", "");
+  
 ?>
 
 <html>

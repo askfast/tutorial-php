@@ -31,6 +31,24 @@ require_once('askfast/lib/answerresult.php');
     
     function app_bid() {
         
+        $session = new Session();
+        $responder = str_ireplace("@outbound","",$session->getResponder());
+        
+        getDBConn();
+        $maxBids = 2;
+        $query = "SELECT * FROM bid";
+        $res = mysql_query($query);
+        $count = 0;
+            while(($row = mysql_fetch_assoc($res))!==false) {
+                if($row["Phonenumber"]==$responder)
+                    return app_double_bid();
+            
+            $count++;
+        }
+        
+        if($count>=$maxBids)
+            return app_bidding_closed();
+        
         return app_request_bid();        
     }
     
