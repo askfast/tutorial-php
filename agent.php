@@ -93,14 +93,43 @@ require_once('askfast/lib/answerresult.php');
     function app_thankyou() {
         global $askfast;
         global $filename;
+        
+        getDBConn();
+        $query = "SELECT * FROM bid ORDER BY Amount DESC";
+        $res = mysql_query($query);
+        
+        $count = mysql_numrows($res);
+        if($count >= MAX_BIDS) {
+            $row = mysql_fetch_assoc($res);
+            smsWinner($row["Phonenumber"], $row["Amount"]); 
+        }
                         
         $askfast->say('/audio/thankyou.wav', $filename.'?function=hangup');
         $askfast->finish();
+    }
+    
+    function smsWinner($address, $amount) {
+        global $filename;
+        
+        $publicKey = "timeout@ask-cs.com";
+        $privateKey = "1d5b31f0-dcea-11e2-a710-005056bc0d1b";
+        $askfast = new AskFast($publicKey, $privateKey);
+        $askfast->sms($address,  $filename.'?function=winner&bid='.$amount);
     }
         
     function app_hangup() {
         global $askfast;
         $askfast->hangup();
+        $askfast->finish();
+    }
+    
+    function app_winner() {
+        global $askfast;
+        global $filename;
+        
+        $amount = $_GET["bid"];
+        
+        $askfast->say("Congratulations! You have won with your bid of EUR ".$amount, $filename . '?function=hangup');
         $askfast->finish();
     }
     
@@ -121,6 +150,7 @@ require_once('askfast/lib/answerresult.php');
         case 'start':        app_start();        break;
         case 'bid':        app_bid();        break;
         case 'receivebid':        app_receivebid();        break;
+        case 'winner':        app_winner();        break;
         default:        app_failure();
     }
 ?>
